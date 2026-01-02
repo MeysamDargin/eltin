@@ -1,4 +1,4 @@
-package com.example.eltin_gold
+package gold.eltin.eltin_gold
 
 import io.flutter.embedding.android.FlutterActivity
 
