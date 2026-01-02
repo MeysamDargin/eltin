@@ -44,6 +44,13 @@ dependencies:
   share_plus: ^7.2.1
   url_launcher: ^6.3.2
   shimmer: ^3.0.0
+  flutter_launcher_icons: ^0.14.4
+
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/file_00000000ee706246a1af8283a7b62964.png"
 
 dev_dependencies:
   flutter_test:
