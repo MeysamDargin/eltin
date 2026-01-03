@@ -1,12 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:eltin_gold/providers/price_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:screenshot/screenshot.dart'; // پکیج جدید
 import 'package:share_plus/share_plus.dart';
 import 'package:shamsi_date/shamsi_date.dart';
 
@@ -18,32 +17,25 @@ class ScreenshotScreen extends StatefulWidget {
 }
 
 class _ScreenshotScreenState extends State<ScreenshotScreen> {
-  final GlobalKey _globalKey = GlobalKey();
+  // کنترلر پکیج screenshot
+  final ScreenshotController _screenshotController = ScreenshotController();
+
   bool _isCapturing = false;
 
   Future<void> _captureAndSaveScreenshot() async {
+    if (_isCapturing) return;
+
     setState(() {
       _isCapturing = true;
     });
 
     try {
-      // تاخیر کوتاه برای اطمینان از رندر شدن وضعیت جدید
-      await Future.delayed(const Duration(milliseconds: 100));
+      // capture مستقیم و پایدار (بدون مشکلات RepaintBoundary روی اندروید)
+      final Uint8List? pngBytes = await _screenshotController.capture();
 
-      RenderRepaintBoundary boundary =
-          _globalKey.currentContext!.findRenderObject()
-              as RenderRepaintBoundary;
-
-      // بررسی اینکه آیا boundary آماده است
-      if (boundary.debugNeedsPaint) {
-        await Future.delayed(const Duration(milliseconds: 100));
+      if (pngBytes == null || pngBytes.isEmpty) {
+        throw Exception('تصویر اسکرین‌شات خالی بود');
       }
-
-      ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-      ByteData? byteData = await image.toByteData(
-        format: ui.ImageByteFormat.png,
-      );
-      Uint8List pngBytes = byteData!.buffer.asUint8List();
 
       final directory = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -51,19 +43,21 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
       final imageFile = File(imagePath);
       await imageFile.writeAsBytes(pngBytes);
 
+      if (!mounted) return;
+
       setState(() {
         _isCapturing = false;
       });
 
-      if (mounted) {
-        _showSuccessDialog(imagePath);
-      }
+      _showSuccessDialog(imagePath);
     } catch (e) {
       print('Error capturing screenshot: $e');
-      setState(() {
-        _isCapturing = false;
-      });
+
       if (mounted) {
+        setState(() {
+          _isCapturing = false;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطا در گرفتن اسکرین‌شات: $e'),
@@ -140,7 +134,6 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
       return '---';
     }
 
-    // استفاده از زمان طلای ۱۸ عیار به عنوان مرجع، یا اولین آیتم موجود
     final referenceItem = prices['tgju_gold_irg18'] ?? prices.values.first;
     final dateTime = referenceItem.ts;
 
@@ -157,15 +150,13 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(
-        0xFF1a3235,
-      ), // رنگ پس‌زمینه پیش‌فرض برای جلوگیری از سفیدی در اسکرول
+      backgroundColor: const Color(0xFF1a3235),
       body: Stack(
         children: [
-          // محتوای اصلی - اسکرول‌بل
+          // محتوای اصلی – حالا داخل Screenshot ویجت پیچیده شده
           SingleChildScrollView(
-            child: RepaintBoundary(
-              key: _globalKey,
+            child: Screenshot(
+              controller: _screenshotController,
               child: Container(
                 constraints: BoxConstraints(
                   minHeight: MediaQuery.of(context).size.height,
@@ -226,7 +217,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             ),
           ),
 
-          // لودینگ هنگام اسکرین‌شات
+          // لودینگ هنگام capture
           if (_isCapturing)
             Container(
               color: Colors.black54,
@@ -239,13 +230,11 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
     );
   }
 
+  // بقیه ویجت‌ها دقیقاً همون قبلی – بدون هیچ تغییری
   Widget _buildPriceContent() {
     return Column(
       children: [
-        // فضای بالا برای لوگوی بک‌گراند
         const SizedBox(height: 170),
-
-        // عنوان
         const Text(
           'قیمت لحظه‌ ای بازار',
           style: TextStyle(
@@ -255,10 +244,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             color: Color(0xffd9c68b),
           ),
         ),
-
         const SizedBox(height: 8),
-
-        // تاریخ و ساعت
         Consumer<PriceProvider>(
           builder: (context, provider, child) {
             return Container(
@@ -279,10 +265,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             );
           },
         ),
-
         const SizedBox(height: 30),
-
-        // لیست قیمت‌ها
         Consumer<PriceProvider>(
           builder: (context, provider, child) {
             if (provider.prices == null) {
@@ -363,7 +346,6 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // قیمت (سمت چپ)
                             Expanded(
                               child: Text(
                                 '$priceText تومان',
@@ -377,7 +359,6 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                               ),
                             ),
                             const SizedBox(width: 16),
-                            // آیکون و نام (سمت راست)
                             Row(
                               children: [
                                 Text(
@@ -410,7 +391,6 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                           ],
                         ),
                       ),
-                      // خط جداکننده
                       if (index != items.length - 1)
                         Container(
                           height: 1.5,

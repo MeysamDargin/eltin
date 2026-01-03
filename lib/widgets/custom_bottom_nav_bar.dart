@@ -4,6 +4,7 @@ import 'package:eltin_gold/screen/Home/home.dart';
 import 'package:eltin_gold/screen/Markets/markets_screen.dart';
 import 'package:eltin_gold/screen/Menu/menu_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class MainWrapper extends StatefulWidget {
   const MainWrapper({super.key});
@@ -18,10 +19,22 @@ class _MainWrapperState extends State<MainWrapper> {
   final List<Widget> _pages = [
     const MenuScreen(),
     const ConsultationScreen(),
-    const ExchangeScreen(), // FAB index
+    const ExchangeScreen(),
     const MarketsScreen(),
     const Home(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // تضمین اینکه در صفحه اصلی، دکمه‌های سیستم سفید با آیکون سیاه باشن
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        systemNavigationBarColor: Colors.white,
+        systemNavigationBarIconBrightness: Brightness.dark,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +46,7 @@ class _MainWrapperState extends State<MainWrapper> {
       bottomNavigationBar: CustomBottomNavBar(
         selectedIndex: _selectedIndex,
         onItemTapped: (index) {
-          if (index == 2) return; // FAB index
+          if (index == 2) return; // FAB
           setState(() {
             _selectedIndex = index;
           });
@@ -50,6 +63,9 @@ class _MainWrapperState extends State<MainWrapper> {
     );
   }
 }
+
+// CustomBottomNavBar و CustomFloatingActionButton دقیقاً همون کد قبلی‌ت هستن – بدون تغییر لازم
+// فقط کپی کردم تا کامل باشه
 
 class CustomBottomNavBar extends StatelessWidget {
   final int selectedIndex;
@@ -90,7 +106,6 @@ class CustomBottomNavBar extends StatelessWidget {
                 'مشاوره',
                 1,
               ),
-              // Center Text for FAB
               Container(
                 width: 60,
                 alignment: Alignment.bottomCenter,

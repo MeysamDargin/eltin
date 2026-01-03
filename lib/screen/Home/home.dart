@@ -350,7 +350,7 @@ class Home extends StatelessWidget {
   Widget _buildBalanceCard() {
     return Consumer<PriceProvider>(
       builder: (context, provider, child) {
-        final priceItem = provider.prices?.current['geram18'];
+        final priceItem = provider.prices?.current['tgju_gold_irg18'];
         String priceText = '---';
         String changePercent = '---';
         String dateText = '---';
