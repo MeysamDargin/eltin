@@ -149,6 +149,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       backgroundColor: const Color(0xFF1a3235),
       body: Stack(
@@ -158,9 +159,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             child: Screenshot(
               controller: _screenshotController,
               child: Container(
-                constraints: BoxConstraints(
-                  minHeight: MediaQuery.of(context).size.height,
-                ),
+                constraints: BoxConstraints(minHeight: screenHeight),
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
@@ -171,10 +170,10 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                 child: SafeArea(
                   child: Column(
                     children: [
-                      _buildPriceContent(),
-                      const SizedBox(height: 20),
+                      _buildPriceContent(screenHeight),
+                      SizedBox(height: screenHeight * 0.02),
                       _buildFooter(),
-                      const SizedBox(height: 40),
+                      SizedBox(height: screenHeight * 0.05),
                     ],
                   ),
                 ),
@@ -231,10 +230,12 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
   }
 
   // بقیه ویجت‌ها دقیقاً همون قبلی – بدون هیچ تغییری
-  Widget _buildPriceContent() {
+  Widget _buildPriceContent(double screenHeight) {
     return Column(
       children: [
-        const SizedBox(height: 170),
+        SizedBox(
+          height: screenHeight * 0.2,
+        ), // تنظیم پویا بر اساس ارتفاع صفحه (تقریبا 170 برای iPhone 16 با ارتفاع ~852 logical pixels)
         const Text(
           'قیمت لحظه‌ ای بازار',
           style: TextStyle(
@@ -244,7 +245,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             color: Color(0xffd9c68b),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: screenHeight * 0.01),
         Consumer<PriceProvider>(
           builder: (context, provider, child) {
             return Container(
@@ -265,7 +266,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             );
           },
         ),
-        const SizedBox(height: 30),
+        SizedBox(height: screenHeight * 0.035),
         Consumer<PriceProvider>(
           builder: (context, provider, child) {
             if (provider.prices == null) {
@@ -318,7 +319,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             ];
 
             return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              padding: EdgeInsets.symmetric(horizontal: screenHeight * 0.028),
               child: Column(
                 children: List.generate(items.length, (index) {
                   final item = items[index];
@@ -342,7 +343,9 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
                   return Column(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        padding: EdgeInsets.symmetric(
+                          vertical: screenHeight * 0.012,
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

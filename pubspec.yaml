@@ -47,7 +47,6 @@ dependencies:
   flutter_launcher_icons: ^0.14.4
   screenshot: ^3.0.0
 
-
 flutter_launcher_icons:
   android: true
   ios: true
