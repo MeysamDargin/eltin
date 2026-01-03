@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart'; // حتماً به pubspec.yaml اضافه کن
 import 'package:shimmer/shimmer.dart';
 import 'package:eltin_gold/providers/price_provider.dart';
 import 'package:eltin_gold/screen/MarketDetail/market_detail_screen.dart';
@@ -16,7 +17,6 @@ class _CryptoScreenState extends State<CryptoScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  // List of all crypto keys extracted from nemoneh.json (USD versions)
   final Map<String, String> _cryptoMap = {
     'crypto-avalanche': 'Avalanche',
     'crypto-binance-coin': 'Binance Coin',
@@ -61,6 +61,91 @@ class _CryptoScreenState extends State<CryptoScreen> {
     'crypto-zcash': 'Zcash',
   };
 
+  final Map<String, String?> _cryptoIcons = {
+    'Avalanche':
+        'https://assets.coingecko.com/coins/images/12559/large/Avalanche_Circle_RedWhite_Trans.png?1696512369',
+    'Binance Coin':
+        'https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png?1696501970',
+    'Bitcoin':
+        'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400',
+    'Bitcoin Cash':
+        'https://assets.coingecko.com/coins/images/780/large/bitcoin-cash-circle.png?1696501932',
+    'BitTorrent':
+        'https://assets.coingecko.com/coins/images/22457/large/btt_logo.png?1696522119',
+    'Cardano':
+        'https://assets.coingecko.com/coins/images/975/large/cardano.png?1696502090',
+    'Cashaa':
+        'https://assets.coingecko.com/coins/images/2541/large/cashaa.png?1696503340',
+    'Chainlink':
+        'https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png?1696502009',
+    'Cosmos':
+        'https://assets.coingecko.com/coins/images/1481/large/cosmos_hub.png?1696502525',
+    'Dash':
+        'https://assets.coingecko.com/coins/images/19/large/dash-logo.png?1696502023',
+    'Decred':
+        'https://assets.coingecko.com/coins/images/486/large/decred.png?1696502040',
+    'Dogecoin':
+        'https://assets.coingecko.com/coins/images/5/large/dogecoin.png?1696501409',
+    'Elrond':
+        'https://assets.coingecko.com/coins/images/12335/large/egld-token.png?1696512162',
+    'EOS':
+        'https://assets.coingecko.com/coins/images/738/large/eos-eos-logo.png?1696501893',
+    'Ethereum':
+        'https://assets.coingecko.com/coins/images/279/large/ethereum.png?1696501628',
+    'Ethereum Classic':
+        'https://assets.coingecko.com/coins/images/453/large/ethereum-classic-logo.png?1696501668',
+    'Fantom':
+        'https://assets.coingecko.com/coins/images/4001/large/Fantom_round.png?1696504642',
+    'Filecoin':
+        'https://assets.coingecko.com/coins/images/12817/large/filecoin.png?1696512609',
+    'Flow':
+        'https://assets.coingecko.com/coins/images/13446/large/5f6294c0c7a8cda55cb1c936_Flow_Wordmark.png?1696513210',
+    'Gala':
+        'https://assets.coingecko.com/coins/images/12493/large/GALA_token_image_-_200PNG.png?1709725869',
+    'Litecoin':
+        'https://assets.coingecko.com/coins/images/2/large/litecoin.png?1696501400',
+    'Loopring':
+        'https://assets.coingecko.com/coins/images/913/large/LRC.png?1696502034',
+    'Maker':
+        'https://assets.coingecko.com/coins/images/1364/large/Mark_Maker.png?1696502428',
+    'Monero':
+        'https://assets.coingecko.com/coins/images/69/large/monero_logo.png?1696501460',
+    'NEM':
+        'https://assets.coingecko.com/coins/images/242/large/NEM_Logo.png?1696501598',
+    'NEO':
+        'https://assets.coingecko.com/coins/images/480/large/NEO_512_512.png?1696501735',
+    'PancakeSwap':
+        'https://assets.coingecko.com/coins/images/12632/large/pancakeswap-cake-logo_%282%29.png?1696512440',
+    'Polkadot':
+        'https://assets.coingecko.com/coins/images/12171/large/polkadot.png?1696512012',
+    'XRP':
+        'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png?1696501442',
+    'The Sandbox':
+        'https://assets.coingecko.com/coins/images/12129/large/sandbox_logo.jpg?1696511971',
+    'Shiba Inu':
+        'https://assets.coingecko.com/coins/images/11939/large/shiba.png?1696511800',
+    'Solana':
+        'https://assets.coingecko.com/coins/images/4128/large/solana.png?1696504756',
+    'Stellar':
+        'https://assets.coingecko.com/coins/images/100/large/Stellar_symbol_black_RGB.png?1696501482',
+    'Tether':
+        'https://assets.coingecko.com/coins/images/325/large/Tether.png?1696501661',
+    'Tezos':
+        'https://assets.coingecko.com/coins/images/976/large/Tezos-logo.png?1696502091',
+    'Toncoin':
+        'https://assets.coingecko.com/coins/images/17980/large/ton_symbol.png?1696517498',
+    'TRON':
+        'https://assets.coingecko.com/coins/images/1094/large/tron-logo.png?1696502193',
+    'Uniswap':
+        'https://assets.coingecko.com/coins/images/12504/large/uniswap-logo.png?1696512319',
+    'USD Coin':
+        'https://assets.coingecko.com/coins/images/6319/large/usdc.png?1696506694',
+    'Waves':
+        'https://assets.coingecko.com/coins/images/425/large/Waves.png?1696501881',
+    'Zcash':
+        'https://assets.coingecko.com/coins/images/486/large/circle-zcash-color.png?1696501740',
+  };
+
   Widget _buildShimmerItem() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -83,7 +168,13 @@ class _CryptoScreenState extends State<CryptoScreen> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(width: 100, height: 16, color: Colors.white),
+              Row(
+                children: [
+                  Container(width: 40, height: 40, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Container(width: 100, height: 16, color: Colors.white),
+                ],
+              ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
@@ -124,7 +215,6 @@ class _CryptoScreenState extends State<CryptoScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left side: Back + Refresh
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -165,7 +255,6 @@ class _CryptoScreenState extends State<CryptoScreen> {
               ),
             ],
           ),
-          // Title and Icon
           Row(
             children: [
               const Text(
@@ -269,6 +358,8 @@ class _CryptoScreenState extends State<CryptoScreen> {
           separatorBuilder: (context, index) => const SizedBox(height: 12),
           itemBuilder: (context, index) {
             final data = filteredItems[index];
+            final String? iconUrl = _cryptoIcons[data['name']];
+
             return GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -278,12 +369,15 @@ class _CryptoScreenState extends State<CryptoScreen> {
                       marketKey: data['key'],
                       marketName: data['name'],
                       isRial: false,
-                      iconPath: 'assets/icons/coin-bit-coin-svgrepo-com.png',
+                      iconPath:
+                          'assets/icons/coin-bit-coin-svgrepo-com.png', // fallback برای صفحات قدیمی
+                      networkIconUrl:
+                          iconUrl, // این خط مهمه! آیکون واقعی رو می‌فرسته
                     ),
                   ),
                 );
               },
-              child: _buildCryptoCard(data['name'], data['item']),
+              child: _buildCryptoCard(data['name'], data['item'], iconUrl),
             );
           },
         );
@@ -291,14 +385,13 @@ class _CryptoScreenState extends State<CryptoScreen> {
     );
   }
 
-  Widget _buildCryptoCard(String name, dynamic item) {
+  Widget _buildCryptoCard(String name, dynamic item, String? iconUrl) {
     bool isPositive = true;
     double percentVal = 0.0;
     try {
       percentVal = double.parse(item.dp.toString());
     } catch (_) {}
 
-    // Determine color based on change direction/value
     if (item.dt == 'high' || percentVal > 0) {
       isPositive = true;
     } else {
@@ -309,9 +402,6 @@ class _CryptoScreenState extends State<CryptoScreen> {
     if (isPositive) {
       changePercent = '+$changePercent';
     } else {
-      // if it's already negative number, toString covers it, but usually dp is absolute in some APIs?
-      // In nemoneh.json, dp is positive number, dt indicates direction.
-      // "dt": "low" -> negative.
       if (item.dt == 'low') {
         changePercent = '-$changePercent';
         isPositive = false;
@@ -319,7 +409,6 @@ class _CryptoScreenState extends State<CryptoScreen> {
     }
 
     String priceText = item.p.toString();
-    // Format price with commas if it's a number
     try {
       String rawPrice = priceText.replaceAll(',', '');
       double priceVal = double.parse(rawPrice);
@@ -343,19 +432,44 @@ class _CryptoScreenState extends State<CryptoScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left: Name (English)
-          Text(
-            name,
-            style: const TextStyle(
-              fontFamily:
-                  'Vazir', // Keeping Vazir for consistency, though text is English
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1F2937),
-            ),
+          Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: iconUrl != null
+                    ? CachedNetworkImage(
+                        imageUrl: iconUrl,
+                        width: 40,
+                        height: 40,
+                        placeholder: (context, url) => const SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/icons/coin-bit-coin-svgrepo-com.png',
+                          width: 40,
+                          height: 40,
+                        ),
+                      )
+                    : Image.asset(
+                        'assets/icons/coin-bit-coin-svgrepo-com.png',
+                        width: 40,
+                        height: 40,
+                      ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                name,
+                style: const TextStyle(
+                  fontFamily: 'Vazir',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+            ],
           ),
-
-          // Right: Price and Percent
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [

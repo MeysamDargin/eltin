@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eltin_gold/models/tgju_model.dart';
 import 'package:eltin_gold/providers/price_provider.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,9 @@ import 'package:shamsi_date/shamsi_date.dart';
 class MarketDetailScreen extends StatelessWidget {
   final String marketKey;
   final String marketName;
-  final String iconPath;
-  final Widget? iconWidget;
+  final String iconPath; // برای سازگاری با صفحات قبلی (طلا، سکه و ...)
+  final Widget? iconWidget; // نگه داشته شد — اولویت اول اگر وجود داشته باشه
+  final String? networkIconUrl; // جدید: آیکون واقعی از شبکه (کریپتو)
   final bool isRial;
 
   const MarketDetailScreen({
@@ -18,6 +20,7 @@ class MarketDetailScreen extends StatelessWidget {
     required this.marketName,
     this.iconPath = '',
     this.iconWidget,
+    this.networkIconUrl,
     required this.isRial,
   });
 
@@ -88,13 +91,53 @@ class MarketDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 12),
+
+            // اولویت ۱: iconWidget (اگر پاس داده شده باشه — مثل قبل)
             if (iconWidget != null)
-              SizedBox(width: 32, height: 32, child: iconWidget)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: SizedBox(width: 36, height: 36, child: iconWidget),
+              )
+            // اولویت ۲: آیکون شبکه‌ای (کریپتو)
+            else if (networkIconUrl != null && networkIconUrl!.isNotEmpty)
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: CachedNetworkImage(
+                  imageUrl: networkIconUrl!,
+                  width: 36,
+                  height: 36,
+                  placeholder: (context, url) => const SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                  errorWidget: (context, url, error) => _fallbackIcon(),
+                ),
+              )
+            // اولویت ۳: آیکون محلی از assets
             else if (iconPath.isNotEmpty)
-              Image.asset(iconPath, width: 32, height: 32),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(18),
+                child: Image.asset(iconPath, width: 36, height: 36),
+              )
+            // fallback نهایی
+            else
+              _fallbackIcon(),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _fallbackIcon() {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(18),
+      child: Image.asset(
+        'assets/icons/coin-bit-coin-svgrepo-com.png',
+        width: 36,
+        height: 36,
+        color: const Color.fromARGB(255, 60, 85, 88),
+      ),
     );
   }
 
@@ -109,7 +152,6 @@ class MarketDetailScreen extends StatelessWidget {
       isPositive = false;
     }
 
-    // Format update time
     String updateTime = _toPersianDigits(item.t);
     try {
       Jalali jalali = Jalali.fromDateTime(item.ts);
@@ -216,6 +258,7 @@ class MarketDetailScreen extends StatelessWidget {
     );
   }
 
+  // بقیه توابع دقیقاً مثل کد اصلی‌ت (بدون تغییر)
   Widget _buildBuySellRow(dynamic sellItem, dynamic buyItem) {
     return Row(
       children: [
@@ -346,12 +389,6 @@ class MarketDetailScreen extends StatelessWidget {
   Widget _buildDetailRow(String label, String value, {bool isChange = false}) {
     String formattedValue = _formatPrice(value);
     Color valueColor = const Color(0xFF1F2937);
-
-    if (isChange) {
-      // If it's a change value, we might want to color it based on sign if available
-      // But 'd' is absolute change usually. Let's just keep it neutral or use standard formatting.
-      // Usually 'd' doesn't have +/- signs in the raw string for some APIs, but let's just format it.
-    }
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

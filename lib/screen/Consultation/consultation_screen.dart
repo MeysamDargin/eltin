@@ -5,7 +5,7 @@ class ConsultationScreen extends StatelessWidget {
   const ConsultationScreen({super.key});
 
   Future<void> _launchWhatsApp() async {
-    final Uri url = Uri.parse('https://wa.me/989122962306');
+    final Uri url = Uri.parse('https://wa.me/989028485858');
     if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
       throw Exception('Could not launch $url');
     }
@@ -72,7 +72,7 @@ class ConsultationScreen extends StatelessWidget {
                           ),
                           SizedBox(height: 16),
                           Text(
-                            'تیم مشاوره آلتین گلد',
+                            'تیم مشاوره التین گلد',
                             style: TextStyle(
                               fontFamily: 'Vazir',
                               fontSize: 24,
@@ -116,7 +116,7 @@ class ConsultationScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'تیم متخصص آلتین گلد با سال‌ها تجربه در بازارهای مالی، طلا و ارز، آماده ارائه بهترین راهکارهای سرمایه‌گذاری متناسب با سرمایه و اهداف مالی شماست. ما در کنار شما هستیم تا با اطمینان خاطر، دارایی خود را حفظ و رشد دهید.',
+                      'تیم متخصص التین گلد با سال‌ها تجربه در بازارهای مالی، طلا و ارز، آماده ارائه بهترین راهکارهای سرمایه‌گذاری متناسب با سرمایه و اهداف مالی شماست. ما در کنار شما هستیم تا با اطمینان خاطر، دارایی خود را حفظ و رشد دهید.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontFamily: 'Vazir',
