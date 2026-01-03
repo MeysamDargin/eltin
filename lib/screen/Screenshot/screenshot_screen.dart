@@ -234,7 +234,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
     return Column(
       children: [
         SizedBox(
-          height: screenHeight * 0.2,
+          height: screenHeight * 0.24,
         ), // تنظیم پویا بر اساس ارتفاع صفحه (تقریبا 170 برای iPhone 16 با ارتفاع ~852 logical pixels)
         const Text(
           'قیمت لحظه‌ ای بازار',
@@ -266,7 +266,7 @@ class _ScreenshotScreenState extends State<ScreenshotScreen> {
             );
           },
         ),
-        SizedBox(height: screenHeight * 0.035),
+        SizedBox(height: screenHeight * 0.010),
         Consumer<PriceProvider>(
           builder: (context, provider, child) {
             if (provider.prices == null) {
